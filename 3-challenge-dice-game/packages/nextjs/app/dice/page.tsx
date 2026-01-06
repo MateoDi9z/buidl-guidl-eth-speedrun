@@ -34,13 +34,11 @@ const DiceGame: NextPage = () => {
   const { data: rollsHistoryData, isLoading: rollsHistoryLoading } = useScaffoldEventHistory({
     contractName: "DiceGame",
     eventName: "Roll",
-    watch: true,
+    watch: typeof window !== "undefined",
   });
 
   useEffect(() => {
     if (!rollsHistoryLoading && rollsHistoryData?.length) {
-      setIsRolling(false);
-
       const clean = rollsHistoryData
         .filter(e => e && e.args)
         .map(({ args }) => ({
@@ -49,20 +47,22 @@ const DiceGame: NextPage = () => {
           roll: (args!.roll as bigint).toString(16).toUpperCase(),
         }));
 
-      setRolls(clean);
+      setRolls(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(clean)) return prev;
+        setIsRolling(false);
+        return clean;
+      });
     }
   }, [rollsHistoryData, rollsHistoryLoading]);
 
   const { data: winnerHistoryData, isLoading: winnerHistoryLoading } = useScaffoldEventHistory({
     contractName: "DiceGame",
     eventName: "Winner",
-    watch: true,
+    watch: typeof window !== "undefined",
   });
 
   useEffect(() => {
     if (!winnerHistoryLoading && winnerHistoryData?.length) {
-      setIsRolling(false);
-
       const clean = winnerHistoryData
         .filter(e => e && e.args)
         .map(({ args }) => ({
@@ -70,7 +70,11 @@ const DiceGame: NextPage = () => {
           amount: args!.amount as bigint,
         }));
 
-      setWinners(clean);
+      setWinners(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(clean)) return prev;
+        setIsRolling(false);
+        return clean;
+      });
     }
   }, [winnerHistoryData, winnerHistoryLoading]);
 
