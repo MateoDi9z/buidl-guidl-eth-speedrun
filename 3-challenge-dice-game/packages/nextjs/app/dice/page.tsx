@@ -13,6 +13,8 @@ import {
 } from "~~/hooks/scaffold-eth";
 import { useWatchBalance } from "~~/hooks/scaffold-eth/useWatchBalance";
 
+const isClient = typeof window !== "undefined";
+
 const ROLL_ETH_VALUE = "0.002";
 const MAX_TABLE_ROWS = 10;
 
@@ -34,7 +36,8 @@ const DiceGame: NextPage = () => {
   const { data: rollsHistoryData, isLoading: rollsHistoryLoading } = useScaffoldEventHistory({
     contractName: "DiceGame",
     eventName: "Roll",
-    watch: typeof window !== "undefined",
+    watch: isClient,
+    enabled: isClient,
   });
 
   useEffect(() => {
@@ -58,7 +61,8 @@ const DiceGame: NextPage = () => {
   const { data: winnerHistoryData, isLoading: winnerHistoryLoading } = useScaffoldEventHistory({
     contractName: "DiceGame",
     eventName: "Winner",
-    watch: typeof window !== "undefined",
+    watch: isClient,
+    enabled: isClient,
   });
 
   useEffect(() => {
