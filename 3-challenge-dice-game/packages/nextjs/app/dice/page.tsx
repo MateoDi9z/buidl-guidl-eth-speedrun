@@ -38,22 +38,20 @@ const DiceGame: NextPage = () => {
   });
 
   useEffect(() => {
-    if (
-      !rollsHistoryLoading &&
-      Boolean(rollsHistoryData?.length) &&
-      (rollsHistoryData?.length as number) > rolls.length
-    ) {
+    if (!rollsHistoryLoading && rollsHistoryData?.length) {
       setIsRolling(false);
 
-      setRolls(
-        rollsHistoryData?.map(({ args }) => ({
-          address: args.player as AddressType,
-          amount: Number(args.amount),
-          roll: (args.roll as bigint).toString(16).toUpperCase(),
-        })) || [],
-      );
+      const clean = rollsHistoryData
+        .filter(e => e && e.args)
+        .map(({ args }) => ({
+          address: args!.player as AddressType,
+          amount: Number(args!.amount),
+          roll: (args!.roll as bigint).toString(16).toUpperCase(),
+        }));
+
+      setRolls(clean);
     }
-  }, [rolls, rollsHistoryData, rollsHistoryLoading]);
+  }, [rollsHistoryData, rollsHistoryLoading]);
 
   const { data: winnerHistoryData, isLoading: winnerHistoryLoading } = useScaffoldEventHistory({
     contractName: "DiceGame",
@@ -62,21 +60,19 @@ const DiceGame: NextPage = () => {
   });
 
   useEffect(() => {
-    if (
-      !winnerHistoryLoading &&
-      Boolean(winnerHistoryData?.length) &&
-      (winnerHistoryData?.length as number) > winners.length
-    ) {
+    if (!winnerHistoryLoading && winnerHistoryData?.length) {
       setIsRolling(false);
 
-      setWinners(
-        winnerHistoryData?.map(({ args }) => ({
-          address: args.winner as AddressType,
-          amount: args.amount as bigint,
-        })) || [],
-      );
+      const clean = winnerHistoryData
+        .filter(e => e && e.args)
+        .map(({ args }) => ({
+          address: args!.winner as AddressType,
+          amount: args!.amount as bigint,
+        }));
+
+      setWinners(clean);
     }
-  }, [winnerHistoryData, winnerHistoryLoading, winners.length]);
+  }, [winnerHistoryData, winnerHistoryLoading]);
 
   const { writeContractAsync: writeDiceGameAsync, isError: rollTheDiceError } = useScaffoldWriteContract({
     contractName: "DiceGame",
